@@ -36,11 +36,13 @@ function generateMaterialPalette(baseColor) {
   const step = (colorLuminance > 0.5) ? -0.1 : 0.1;
   
   const palette = [];
+  const index500 = 4;
   for (let i = 0; i < 9; i++) {
-    const shade = baseColor.clone().lighten(step * i * 10);
+    const shade = baseColor.clone().lighten(step * (i - index500) * 10);
     palette.push(shade);
   }
   return palette;
 }
+
 
     
