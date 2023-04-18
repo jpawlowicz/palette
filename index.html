@@ -5,96 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Palette Generator</title>
     <link href="./tailwind.min.css" rel="stylesheet">
-    <script src="./iro.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.2/tinycolor.min.js"></script>
-</head>
+  </head>
 
-<body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen">
+  <body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen">
     <div class="container mx-auto px-4 py-12">
-        <div class="bg-white rounded-lg p-8 shadow-md max-w-lg mx-auto">
-            <h1 class="text-2xl font-bold mb-4 text-center">Color Palette Generator</h1>
-            <p class="text-center mb-8">Choose your base color and generate a 9-color palette for your UI design.</p>
-            <div class="grid grid-cols-2 gap-8">
-                <div>
-                    <label class="block mb-2">Base Color:</label>
-                    <div id="colorPicker" class="mb-4"></div>
-                    <input type="text" id="hexInput" class="block w-full border border-gray-300 rounded-lg mb-4 pl-2" placeholder="Enter hex code">
-                    <button id="submitButton" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
-                </div>
-                <div>
-                    <div id="colorSwatches" class="grid grid-cols-3 gap-4">
-                        <!-- Color swatches will be added here -->
-                    </div>
-                    <div class="mt-4">
-                        <h3 class="text-center mb-2">Picked Color:</h3>
-                        <div id="pickedColor" class="h-16 w-16 mx-auto rounded-lg text-white flex items-center justify-center"></div>
-                    </div>
-                </div>
+      <div class="bg-white rounded-lg p-8 shadow-md max-w-lg mx-auto">
+        <h1 class="text-2xl font-bold mb-4 text-center">Color Palette Generator</h1>
+        <p class="text-center mb-8">Choose your base color and generate a 6-color palette for your UI design.</p>
+        <div class="grid grid-cols-2 gap-8">
+          <div>
+            <label class="block mb-2">Base Color:</label>
+            <input type="text" id="hexInput" class="block w-full border border-gray-300 rounded-lg mb-4 pl-2" placeholder="Enter hex code" value="#6C63FF">
+            <button id="submitButton" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
+          </div>
+          <div>
+            <div id="colorSwatches" class="grid grid-cols-3 gap-4">
+              <!-- Color swatches will be added here -->
             </div>
+          </div>
         </div>
+      </div>
     </div>
-    <footer class="text-center text-white mt-8">
-        Developed with love by Joanna Wrobel <span class="text-red-500">&hearts;</span>
-    </footer>
     <script>
- function createColorSwatch(color) {
-  const swatch = document.createElement('div');
-  swatch.className = 'h-16 w-16 rounded-lg';
-  swatch.style.backgroundColor = color;
-  return swatch;
+      function createColorSwatch(color) {
+        const swatch = document.createElement('div');
+        swatch.className = 'h-16 w-16 rounded-lg';
+        swatch.style.backgroundColor = color;
+        return swatch;
+      }
+
+      function updateSwatches(baseColor) {
+        const colorSwatches = document.getElementById('colorSwatches');
+        colorSwatches.innerHTML = '';
+        const palette = generatePalette(baseColor);
+
+        palette.forEach(color => {
+          colorSwatches.appendChild(createColorSwatch(color));
+        });
+      }
+      function generatePalette(baseColor) {
+        const base = tinycolor(baseColor);
+        const palette = [
+                base.clone().desaturate(5).lighten(56),
+                base.clone().desaturate(5).lighten(48),
+                base.clone().desaturate(8).lighten(35),
+                base.clone().desaturate(10).lighten(25),
+                base.clone().desaturate(10).lighten(15),
+                base,
+                base.clone().saturate(10).darken(10),
+                base.clone().darken(15),
+                base.clone().darken(20),
+                ];
+
+return palette.map(color => color.toHexString());
 }
-
-function updateSwatches(baseColor) {
-  const colorSwatches = document.getElementById('colorSwatches');
-  colorSwatches.innerHTML = '';
-  const palette = generatePalette(baseColor);
-
-  palette.forEach(color => {
-    colorSwatches.appendChild(createColorSwatch(color));
-  });
-}
-
-function generatePalette(baseColor) {
-  const base = tinycolor(baseColor);
-  const palette = [
-    base.clone().desaturate(5).lighten(56),
-    base.clone().desaturate(5).lighten(48),
-    base.clone().desaturate(8).lighten(35),
-    base.clone().desaturate(10).lighten(25),
-    base.clone().desaturate(10).lighten(15),
-    base,
-    base.clone().saturate(10).darken(10),
-    base.clone().darken(15),
-    base.clone().darken(20),
-  ];
-
-  return palette.map(color => color.toHexString());
-}
-
-const colorPicker = new iro.ColorPicker('#colorPicker', {
-  width: 200,
-  height: 200,
-  color: 'rgb(108, 99, 255)'
-});
-
 const hexInput = document.getElementById('hexInput');
-hexInput.value = colorPicker.color.hexString(); // Set the default value in the input field
+      const submitButton = document.getElementById('submitButton');
 
-colorPicker.on('color:change', color => {
-  hexInput.value = color.hexString();
-  updateSwatches(color.hexString());
-});
+      submitButton.addEventListener('click', () => {
+        const baseColor = hexInput.value;
+        updateSwatches(baseColor);
+      });
 
-hexInput.addEventListener('change', () => {
-  const hex = hexInput.value;
-  if (iro.Color.validateHexColor(hex)) {
-    colorPicker.color.hexString = hex;
-    updateSwatches(hex);
-  }
-});
-
-updateSwatches('#6C63FF'); // Call with the default indigo color
+      // Display the initial palette
+      updateSwatches(hexInput.value);
 
     </script>
-</body>
+  </body>
 </html>
