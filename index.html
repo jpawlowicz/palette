@@ -1,23 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palette Generator</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Generator</title>
+    <link href="./tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 py-8">
-  <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-bold mb-8">Palette Generator</h1>
-    <div id="iro-color-picker"></div>
-    <div class="mt-4 mb-4">
-      <input id="hex-input" class="bg-white border-2 border-gray-300 rounded w-full py-2 px-4" type="text" placeholder="Enter HEX value">
-      <button id="submit-color" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Confirm HEX</button>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen">
+    <div class="container mx-auto px-4 py-12">
+        <div class="bg-white rounded-lg p-8 shadow-md max-w-lg mx-auto">
+            <h1 class="text-2xl font-bold mb-4 text-center">Color Palette Generator</h1>
+            <p class="text-center mb-8">Choose your base color and generate a 9-color palette for your UI design.</p>
+            <div class="grid grid-cols-2 gap-8">
+                <div>
+                    <label class="block mb-2">Base Color:</label>
+                    <input type="color" class="block mb-4">
+                    <input type="text" class="block w-full border border-gray-300 rounded-lg mb-4" placeholder="Enter hex code">
+                    <button class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
+                </div>
+                <div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <!-- Add color swatches here -->
+                        <div class="h-16 w-16 bg-red-500 rounded-lg"></div>
+                        <div class="h-16 w-16 bg-yellow-500 rounded-lg"></div>
+                        <div class="h-16 w-16 bg-green-500 rounded-lg"></div>
+                        <div class="h-16 w-16 bg-blue-500 rounded-lg"></div>
+                        <div class="h-16 w-16 bg-indigo-500 rounded-lg"></div>
+                        <div class="h-16 w-16 bg-purple-500 rounded-lg"></div>
+                        <div class="h-16 w-16 bg-pink-500 rounded-lg"></div>
+                        <div class="h-16 w-16 bg-gray-500 rounded-lg"></div>
+                        <div class="h-16 w-16 bg-teal-500 rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="palette-container" class="flex flex-wrap"></div>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/iro/5.5.2/iro.min.js"></script>
-  <script src="script.js"></script>
+    <footer class="text-center text-white mt-8">
+        Developed with love by Joanna Wrobel <span class="text-red-500">&hearts;</span>
+    </footer>
+    <script src="./iro.min.js"></script>
 </body>
 </html>
