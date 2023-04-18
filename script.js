@@ -1,5 +1,6 @@
 const colorPicker = new iro.ColorPicker("#color-picker");
 const hexInput = document.getElementById("hex-input");
+const confirmHexButton = document.getElementById("confirm-hex");
 const colorGrid = document.getElementById("color-grid");
 
 function createColorBlock(color) {
@@ -24,7 +25,7 @@ colorPicker.on("color:change", (color) => {
   updatePalette();
 });
 
-hexInput.addEventListener("input", updatePalette);
+confirmHexButton.addEventListener("click", updatePalette);
 
 hexInput.value = colorPicker.color.hexString;
 updatePalette();
