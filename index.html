@@ -7,12 +7,11 @@
     <link href="./tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.2/tinycolor.min.js"></script>
   </head>
-
   <body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen">
     <div class="container mx-auto px-4 py-12">
       <div class="bg-white rounded-lg p-8 shadow-md max-w-lg mx-auto">
         <h1 class="text-2xl font-bold mb-4 text-center">Color Palette Generator</h1>
-        <p class="text-center mb-8">Choose your base color and generate a 6-color palette for your UI design.</p>
+        <p class="text-center mb-8">Choose your base color and generate a 9-color palette for your UI design.</p>
         <div class="grid grid-cols-2 gap-8">
           <div>
             <label class="block mb-2">Base Color:</label>
@@ -32,45 +31,59 @@
         const swatch = document.createElement('div');
         swatch.className = 'h-16 w-16 rounded-lg';
         swatch.style.backgroundColor = color;
+        const hexText = document.createElement('p');
+        hexText.innerText = color;
+        hexText.className = 'text-center text-xs mt-1';
+        swatch.appendChild(hexText);
+        swatch.addEventListener('click', () => {
+          navigator.clipboard.writeText(color);
+        });
         return swatch;
       }
 
-      function updateSwatches(baseColor) {
+      function updateSwatches(inputColor) {
         const colorSwatches = document.getElementById('colorSwatches');
         colorSwatches.innerHTML = '';
-        const palette = generatePalette(baseColor);
+        const palette = generatePalette(inputColor);
 
         palette.forEach(color => {
           colorSwatches.appendChild(createColorSwatch(color));
         });
       }
-      function generatePalette(baseColor) {
-        const base = tinycolor(baseColor);
-        const palette = [
-                base.clone().desaturate(5).lighten(56),
-                base.clone().desaturate(5).lighten(48),
-                base.clone().desaturate(8).lighten(35),
-                base.clone().desaturate(10).lighten(25),
-                base.clone().desaturate(10).lighten(15),
-                base,
-                base.clone().saturate(10).darken(10),
-                base.clone().darken(15),
-                base.clone().darken(20),
-                ];
 
-return palette.map(color => color.toHexString());
+      function generatePalette(inputColor) {
+        const inputColorHSL = tinycolor(inputColor).toHsl();
+
+        // Adjust lightness to ensure the base color is in the middle range
+        inputColorHSL.l = 0.5;
+
+        const baseColor = tinycolor(inputColorHSL);
+
+        const palette = [
+          baseColor.clone().lighten(45),
+          baseColor.clone().lighten(30),
+          baseColor.clone().lighten(15),
+          baseColor.clone().lighten(5),
+          baseColor,
+          baseColor.clone().darken(5),
+          baseColor.clone().darken(15),
+          baseColor.clone().darken(25),
+          baseColor.clone().darken(35),
+        ];
+
+        return palette.map(color => color.toHexString());
 }
 const hexInput = document.getElementById('hexInput');
-      const submitButton = document.getElementById('submitButton');
+  const submitButton = document.getElementById('submitButton');
 
-      submitButton.addEventListener('click', () => {
-        const baseColor = hexInput.value;
-        updateSwatches(baseColor);
-      });
+  submitButton.addEventListener('click', () => {
+    const hex = hexInput.value;
+    if (tinycolor(hex).isValid()) {
+      updateSwatches(hex);
+    }
+  });
 
-      // Display the initial palette
-      updateSwatches(hexInput.value);
-
-    </script>
-  </body>
+  updateSwatches(hexInput.value); // Call with the default indigo color
+</script>
+</body>
 </html>
