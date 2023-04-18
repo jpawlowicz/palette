@@ -1,32 +1,30 @@
-function createColorDiv(color, index) {
-    const div = document.createElement('div');
-    div.className = 'color-box';
-    div.style.backgroundColor = color.toCSS();
-    div.style.color = index > 600 ? 'white' : 'black';
-    div.textContent = `${index}`;
-    return div;
+const colorPicker = new iro.ColorPicker("#color-picker");
+const hexInput = document.getElementById("hex-input");
+const colorGrid = document.getElementById("color-grid");
+
+function createColorBlock(color) {
+  const colorBlock = document.createElement("div");
+  colorBlock.className = "w-8 h-8 rounded border-2 border-gray-300";
+  colorBlock.style.backgroundColor = color.hexString();
+  return colorBlock;
 }
 
-function generatePalette(baseColor) {
-    const container = document.getElementById('color-grid');
-    container.innerHTML = '';
-
-    const color = new Color(baseColor);
-    const shades = [100, 200, 300, 400, 500, 600, 700, 800, 900];
-
-    for (const shade of shades) {
-        const c = color.darken(1 - shade / 1000);
-        container.appendChild(createColorDiv(c, shade));
-    }
+function updatePalette() {
+  colorGrid.innerHTML = "";
+  const baseColor = new Color(hexInput.value);
+  for (let i = 0; i < 9; i++) {
+    const shade = baseColor.shade(i * 100);
+    const colorBlock = createColorBlock(shade);
+    colorGrid.appendChild(colorBlock);
+  }
 }
 
-const colorPicker = new iro.ColorPicker("#color-picker", {
-    width: 300,
-    color: "#f06",
+colorPicker.on("color:change", (color) => {
+  hexInput.value = color.hexString;
+  updatePalette();
 });
 
-colorPicker.on("color:change", function (color) {
-    generatePalette(color.hexString);
-});
+hexInput.addEventListener("input", updatePalette);
 
-generatePalette(colorPicker.color.hexString);
+hexInput.value = colorPicker.color.hexString;
+updatePalette();
