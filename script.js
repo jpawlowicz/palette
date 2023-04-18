@@ -13,12 +13,13 @@ function createColorBlock(color) {
 function updatePalette() {
   colorGrid.innerHTML = "";
   const baseColor = tinycolor(hexInput.value);
-  for (let i = 0; i < 9; i++) {
-    const shade = baseColor.clone().darken(i * 10);
-    const colorBlock = createColorBlock(shade);
+  const palette = generateMaterialPalette(baseColor);
+  for (const color of palette) {
+    const colorBlock = createColorBlock(color);
     colorGrid.appendChild(colorBlock);
   }
 }
+
 
 colorPicker.on("color:change", (color) => {
   hexInput.value = color.hexString;
@@ -29,3 +30,17 @@ confirmHexButton.addEventListener("click", updatePalette);
 
 hexInput.value = colorPicker.color.hexString;
 updatePalette();
+
+function generateMaterialPalette(baseColor) {
+  const colorLuminance = baseColor.clone().getLuminance();
+  const step = (colorLuminance > 0.5) ? -0.1 : 0.1;
+  
+  const palette = [];
+  for (let i = 0; i < 9; i++) {
+    const shade = baseColor.clone().lighten(step * i * 10);
+    palette.push(shade);
+  }
+  return palette;
+}
+
+    
