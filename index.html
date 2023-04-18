@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Palette Generator</title>
-    <link href="tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palette Generator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-<div class="container mx-auto p-8">
-    <h1 class="text-2xl font-bold mb-4">UI Design Color Palette Generator</h1>
-    <div id="color-picker" class="mx-auto mb-4" style="width: 300px; height: 300px;"></div>
-    <div class="mb-4 margin-top: 50px">
+<body class="bg-gray-100 py-8">
+  <div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold mb-8">Palette Generator</h1>
+    <div class="mb-4">
+      <div id="iro-color-picker"></div>
+      <div id="iro-color-value"></div>
+    </div>
+      <div class="mb-4">
       <input id="hex-input" class="bg-white border-2 border-gray-300 rounded w-full py-2 px-4" type="text" placeholder="Enter HEX value">
-      <button id="confirm-hex" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Confirm HEX</button>
+      <button id="submit-color" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Confirm HEX</button>
     </div>
-    <div class="grid grid-cols-9 gap-4 mt-4" id="color-grid">
-    </div>
-</div>
-<script src="iro.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.2/tinycolor.min.js"></script>
-
-<script src="script.js"></script>
+    <div id="palette-container" class="flex flex-wrap"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iro/5.5.2/iro.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
