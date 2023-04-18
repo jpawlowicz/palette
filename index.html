@@ -1,89 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Palette Generator</title>
-    <link href="./tailwind.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.2/tinycolor.min.js"></script>
-  </head>
-  <body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen">
-    <div class="container mx-auto px-4 py-12">
-      <div class="bg-white rounded-lg p-8 shadow-md max-w-lg mx-auto">
-        <h1 class="text-2xl font-bold mb-4 text-center">Color Palette Generator</h1>
-        <p class="text-center mb-8">Choose your base color and generate a 9-color palette for your UI design.</p>
-        <div class="grid grid-cols-2 gap-8">
-          <div>
-            <label class="block mb-2">Base Color:</label>
-            <input type="text" id="hexInput" class="block w-full border border-gray-300 rounded-lg mb-4 pl-2" placeholder="Enter hex code" value="#6C63FF">
-            <button id="submitButton" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
-          </div>
-          <div>
-            <div id="colorSwatches" class="grid grid-cols-3 gap-4">
-              <!-- Color swatches will be added here -->
-            </div>
-          </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Palette Generator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/vanilla-picker/2.11.1/vanilla-picker.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.2/chroma.min.js"></script>
+  <script src="https://unpkg.com/vanilla-picker@2.11.1"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen">
+<div class="container mx-auto px-4 py-12">
+  <div class="bg-white rounded-lg p-8 shadow-md max-w-lg mx-auto">
+    <h1 class="text-2xl font-bold mb-4 text-center">Color Palette Generator</h1>
+    <p class="text-center mb-8">Choose your base color and generate a 9-color palette for your UI design.</p>
+    <div class="grid grid-cols-2 gap-8">
+      <div>
+        <label class="block mb-2">Base Color:</label>
+        <input type="text" id="hexInput" class="block w-full border border-gray-300 rounded-lg mb-4 pl-2" placeholder="Enter hex code" value="#6C63FF">
+        <div id="colorPreview" class="h-16 w-full mb-4 rounded-lg cursor-pointer"></div>
+        <button id="submitButton" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
+      </div>
+      <div>
+        <div id="colorSwatches" class="grid grid-cols-3 gap-4">
+          <!-- Color swatches will be added here -->
         </div>
       </div>
     </div>
-    <script>
-      function createColorSwatch(color) {
-        const swatch = document.createElement('div');
-        swatch.className = 'h-16 w-16 rounded-lg';
-        swatch.style.backgroundColor = color;
-        const hexText = document.createElement('p');
-        hexText.innerText = color;
-        hexText.className = 'text-center text-xs mt-1';
-        swatch.appendChild(hexText);
-        swatch.addEventListener('click', () => {
-          navigator.clipboard.writeText(color);
-        });
-        return swatch;
-      }
-
-      function updateSwatches(inputColor) {
-        const colorSwatches = document.getElementById('colorSwatches');
-        colorSwatches.innerHTML = '';
-        const palette = generatePalette(inputColor);
-
-        palette.forEach(color => {
-          colorSwatches.appendChild(createColorSwatch(color));
-        });
-      }
-
-      function generatePalette(inputColor) {
-        const inputColorHSL = tinycolor(inputColor).toHsl();
-
-        // Adjust lightness to ensure the base color is in the middle range
-        inputColorHSL.l = 0.5;
-
-        const baseColor = tinycolor(inputColorHSL);
-
-        const palette = [
-          baseColor.clone().lighten(45),
-          baseColor.clone().lighten(30),
-          baseColor.clone().lighten(15),
-          baseColor.clone().lighten(5),
-          baseColor,
-          baseColor.clone().darken(5),
-          baseColor.clone().darken(15),
-          baseColor.clone().darken(25),
-          baseColor.clone().darken(35),
-        ];
-
-        return palette.map(color => color.toHexString());
-}
-const hexInput = document.getElementById('hexInput');
+  </div>
+</div>
+<script>
+  const hexInput = document.getElementById('hexInput');
   const submitButton = document.getElementById('submitButton');
+  const colorPreview = document.getElementById('colorPreview');
 
-  submitButton.addEventListener('click', () => {
-    const hex = hexInput.value;
-    if (tinycolor(hex).isValid()) {
-      updateSwatches(hex);
-    }
+  function updateColorPreview() {
+    const validColor = chroma.valid(hexInput.value) ? hexInput.value : '#6C63FF';
+    colorPreview.style.backgroundColor = validColor;
+  }
+
+  hexInput.addEventListener('input', () => {
+    updateColorPreview();
   });
 
-  updateSwatches(hexInput.value); // Call with the default indigo color
+  const colorPicker = new Picker({
+    parent: colorPreview,
+    popup: 'bottom', // top or bottom
+    onChange: function (color) {
+      hexInput.value = color.hex;
+      updateColorPreview();
+    },
+  });
+
+  colorPreview.addEventListener('click', () => {
+    colorPicker.setColor(hexInput.value);
+    colorPicker.openHandler();
+  });
+
+  function createColorSwatch(color) {
+    const swatch = document.createElement('div');
+    swatch.className = 'h-16 w-16 rounded-lg relative border-2 border-gray-300';
+    swatch.style.backgroundColor = color;
+    return swatch;
+  }
+
+  function updateSwatches(baseColor) {
+  const colorSwatches = document.getElementById('colorSwatches');
+  colorSwatches.innerHTML = '';
+
+  const palette = chroma.scale([chroma(baseColor).brighten(1), chroma(baseColor).darken(1)]).mode('lch').colors(9);
+
+  palette.forEach(color => {
+    const swatch = createColorSwatch(color);
+    colorSwatches.appendChild(swatch);
+  });
+}
+submitButton.addEventListener('click', () => {
+const hex = hexInput.value;
+if (chroma.valid(hex)) {
+  updateSwatches(chroma(hex));
+}
+});
+
+updateColorPreview();
+updateSwatches(chroma(hexInput.value));
+
 </script>
 </body>
 </html>
