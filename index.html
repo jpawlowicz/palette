@@ -5,18 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Palette Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        .color-box {
-            width: 100%;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.25rem;
-            font-weight: bold;
-            font-size: 0.75rem;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100">
 <div class="container mx-auto p-8">
@@ -27,39 +16,6 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/color-js/1.0.1/color.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/iro@5.5.2/lib/iro.min.js"></script>
-<script>
-    function createColorDiv(color, index) {
-        const div = document.createElement('div');
-        div.className = 'color-box';
-        div.style.backgroundColor = color.toCSS();
-        div.style.color = index > 600 ? 'white' : 'black';
-        div.textContent = `${index}`;
-        return div;
-    }
-
-    function generatePalette(baseColor) {
-        const container = document.getElementById('color-grid');
-        container.innerHTML = '';
-
-        const color = new Color(baseColor);
-        const shades = [100, 200, 300, 400, 500, 600, 700, 800, 900];
-
-        for (const shade of shades) {
-            const c = color.darken(1 - shade / 1000);
-            container.appendChild(createColorDiv(c, shade));
-        }
-    }
-
-    const colorPicker = new iro.ColorPicker("#color-picker", {
-        width: 300,
-        color: "#f06",
-    });
-
-    colorPicker.on("color:change", function (color) {
-        generatePalette(color.hexString);
-    });
-
-    generatePalette(colorPicker.color.hexString);
-</script>
+<script src="script.js"></script>
 </body>
 </html>
