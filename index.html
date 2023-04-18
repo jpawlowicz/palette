@@ -1,119 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Palette Generator</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        .color {
-            height: 4rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Palette Generator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .polaroid {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .color-fill {
+      width: 100%;
+      height: 100px;
+      border-radius: 0.25rem;
+    }
+  </style>
 </head>
 <body class="bg-gray-100">
-    <div class="container mx-auto p-8">
-        <h1 class="text-2xl font-bold mb-4">Color Palette Generator</h1>
-        <div class="flex items-center">
-            <span class="text-gray-700 text-sm mr-2">Pick a base color:</span>
-            <input type="color" id="base-color" class="rounded-md">
-        </div>
-        <div class="grid grid-cols-3 gap-4 mt-4">
-            <button onclick="generatePalette('primary')" class="bg-gray-700 text-white px-4 py-2 rounded-md">Primary (Shades)</button>
-            <button onclick="generatePalette('secondary')" class="bg-gray-700 text-white px-4 py-2 rounded-md">Secondary</button>
-            <button onclick="generatePalette('tertiary')" class="bg-gray-700 text-white px-4 py-2 rounded-md">Tertiary</button>
-            <button onclick="generatePalette('complimentary')" class="bg-gray-700 text-white px-4 py-2 rounded-md">Complimentary</button>
-        </div>
-        <div class="grid grid-cols-3 gap-4 mt-4" id="color-grid">
-        </div>
+  <div class="container mx-auto p-8">
+    <h1 class="text-2xl font-bold mb-4">Color Palette Generator</h1>
+    <p class="mb-4">
+      Use the color wheel to pick a base color, or enter a hex value directly. The generated color palette will be displayed below.
+    </p>
+    <div>
+      <input type="color" id="base-color" class="rounded-md">
     </div>
-    <script>
-        function componentToHex(c) {
-            const hex = c.toString(16);
-            return hex.length == 1 ? '0' + hex : hex;
-        }
+    <div class="mt-4">
+      <input id="hex-input" type="text" class="border-2 border-gray-300 rounded-md p-2 w-full" placeholder="Enter hex value">
+    </div>
+    <div class="grid grid-cols-3 gap-4 mt-4" id="color-grid">
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-js/1.0.1/color.min.js"></script>
+  <script>
+    function createColorDiv(color) {
+      const div = document.createElement('div');
+      div.className = 'polaroid';
+      div.innerHTML = `
+        <div class="color-fill" style="background-color: ${color.toCSS()}"></div>
+        <p class="text-gray-800 font-semibold">${color.toCSS()}</p>
+        <p class="text-gray-600 text-xs">${color.toName()}</p>
+      `;
+      div.addEventListener('click', () => {
+        navigator.clipboard.writeText(color.toCSS());
+      });
+      return div;
+    }
 
-        function rgbToHex(r, g, b) {
-            return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
-        }
+    function generatePalette(baseColor) {
+      const container = document.getElementById('color-grid');
+      container.innerHTML = '';
 
-        function rotateColor(color, degrees) {
-            const num = parseInt(color.slice(1), 16);
-            const amt = (Math.round(2.55 * degrees) << 24) | (~(0xff << 24));
-            const result = (num ^ amt) >>> 0;
-            return '#' + result.toString(16).padStart(6, '0');
-        }
+      const color = new Color(baseColor);
+      const palette = color.scheme('analogic', 9);
 
-        function createColorDiv(color) {
-            const div = document.createElement('div');
-            div.className = 'color bg-gradient-to-br from-transparent to-black p-2 rounded-md';
-            div.style.backgroundColor = color;
-            div.innerHTML = `<p class="text-white text-xs font-semibold">${color}</p>`;
-            div.addEventListener('click', () => {
-                navigator.clipboard.writeText(color);
-            });
-            return div;
-        }
+      for (const c of palette.colors()) {
+        container.appendChild(createColorDiv(c));
+      }
+    }
 
-        function generatePalette(mode) {
-            const baseColor = document.getElementById('base-color').value;
-            const container = document.getElementById('color-grid');
-            container.innerHTML = '';
+    function updateBaseColor() {
+      const colorInput = document.getElementById('base-color');
+      const hexInput = document.getElementById('hex-input');
+      hexInput.value = colorInput.value;
+      generatePalette(colorInput.value);
+    }
 
-            const baseColorRgb = parseInt(baseColor.slice(1), 16);
-            const r = baseColorRgb >> 16;
-            const g = (baseColorRgb >> 8) & 0xff;
-            const b = baseColorRgb & 0xff;
+    document.getElementById('base-color').addEventListener('input', updateBaseColor);
 
-            const colorDivs = [];
+    document.getElementById('hex-input').addEventListener('input', (e) => {
+      const colorInput = document.getElementById('base-color');
+      colorInput.value = e.target.value;
+      generatePalette(e.target.value);
+    });
 
-            if (mode === 'complimentary') {
-                for (let i = 0; i < 9; i++) {
-                    const rotatedColor = rotateColor(baseColor, (i * 20) % 360);
-                    colorDivs.push(createColorDiv(rotatedColor));
-                }
-            } else if (mode === 'tertiary') {
-                for (let i = 0; i < 9; i++) {
-                    const rotatedColor = rotateColor(baseColor, (i * 40) % 360);
-                    colorDivs.push(createColorDiv(rotatedColor));
-                }
-            } else if (mode === 'secondary') {
-                for (let i = 0; i < 9; i++) {
-                    const rotatedColor = rotateColor(baseColor, (i * 45) % 360);
-                    colorDivs.push(createColorDiv(rotatedColor));
-                }
-            } else if (mode === 'primary') {
-                const shades = [0.8, 0.6, 0.4, 0.2];
-                for (const shade of shades) {
-                    const sr = Math.round(r + (255 - r) * shade);
-                    const sg = Math.round(g + (255 - g) * shade);
-                    const sb = Math.round(b + (255 - b) * shade);
-                    colorDivs.push(createColorDiv(rgbToHex(sr, sg, sb)));
-                }
-                colorDivs.push(createColorDiv(baseColor));
-                const tints = [0.2, 0.4, 0.6, 0.8];
-                for (const tint of tints) {
-                    const sr = Math.round(r * (1 - tint));
-                    const sg = Math.round(g * (1 - tint));
-                    const sb = Math.round(b * (1 - tint));
-                    colorDivs.push(createColorDiv(rgbToHex(sr, sg, sb)));
-                }
-            }
-
-            for (const colorDiv of colorDivs) {
-                container.appendChild(colorDiv);
-            }
-        }
-
-        document.getElementById('base-color').addEventListener('input', () => generatePalette('primary'));
-
-        generatePalette('primary');
-    </script>
+    updateBaseColor();
+  </script>
 </body>
 </html>
-
