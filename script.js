@@ -6,15 +6,15 @@ const colorGrid = document.getElementById("color-grid");
 function createColorBlock(color) {
   const colorBlock = document.createElement("div");
   colorBlock.className = "w-8 h-8 rounded border-2 border-gray-300";
-  colorBlock.style.backgroundColor = color.hexString();
+  colorBlock.style.backgroundColor = color.toHexString();
   return colorBlock;
 }
 
 function updatePalette() {
   colorGrid.innerHTML = "";
-  const baseColor = new Color(hexInput.value);
+  const baseColor = tinycolor(hexInput.value);
   for (let i = 0; i < 9; i++) {
-    const shade = baseColor.shade(i * 100);
+    const shade = baseColor.clone().darken(i * 10);
     const colorBlock = createColorBlock(shade);
     colorGrid.appendChild(colorBlock);
   }
