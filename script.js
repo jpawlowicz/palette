@@ -32,17 +32,31 @@ hexInput.value = colorPicker.color.hexString;
 updatePalette();
 
 function generateMaterialPalette(baseColor) {
-  const colorLuminance = baseColor.clone().getLuminance();
-  const step = (colorLuminance > 0.5) ? -0.1 : 0.1;
-  
+  const baseLuminance = baseColor.clone().getLuminance();
+  const step = 0.1;
+
+  const shadeLuminanceOffsets = {
+    100: 0.7,
+    200: 0.5,
+    300: 0.333,
+    400: 0.166,
+    500: 0,
+    600: -0.125,
+    700: -0.25,
+    800: -0.375,
+    900: -0.5,
+  };
+
   const palette = [];
-  const index500 = 4;
-  for (let i = 0; i < 9; i++) {
-    const shade = baseColor.clone().lighten(step * (i - index500) * 10);
-    palette.push(shade);
+  for (const shade in shadeLuminanceOffsets) {
+    const targetLuminance = baseLuminance + shadeLuminanceOffsets[shade] * step;
+    const adjustedColor = tinycolor.fromRatio({ l: targetLuminance, s: baseColor.toHsl().s, h: baseColor.toHsl().h });
+    palette.push(adjustedColor);
   }
+
   return palette;
 }
+
 
 
     
