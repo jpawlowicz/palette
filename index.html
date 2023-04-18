@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Palette Generator</title>
     <link href="./tailwind.min.css" rel="stylesheet">
+    <script src="./iro.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.2/tinycolor.min.js"></script>
 </head>
+
 <body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen">
     <div class="container mx-auto px-4 py-12">
         <div class="bg-white rounded-lg p-8 shadow-md max-w-lg mx-auto">
@@ -14,22 +17,17 @@
             <div class="grid grid-cols-2 gap-8">
                 <div>
                     <label class="block mb-2">Base Color:</label>
-                    <input type="color" class="block mb-4">
-                    <input type="text" class="block w-full border border-gray-300 rounded-lg mb-4" placeholder="Enter hex code">
-                    <button class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
+                    <div id="colorPicker" class="mb-4"></div>
+                    <input type="text" id="hexInput" class="block w-full border border-gray-300 rounded-lg mb-4 pl-2" placeholder="Enter hex code">
+                    <button id="submitButton" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
                 </div>
                 <div>
-                    <div class="grid grid-cols-3 gap-4">
-                        <!-- Add color swatches here -->
-                        <div class="h-16 w-16 bg-red-500 rounded-lg"></div>
-                        <div class="h-16 w-16 bg-yellow-500 rounded-lg"></div>
-                        <div class="h-16 w-16 bg-green-500 rounded-lg"></div>
-                        <div class="h-16 w-16 bg-blue-500 rounded-lg"></div>
-                        <div class="h-16 w-16 bg-indigo-500 rounded-lg"></div>
-                        <div class="h-16 w-16 bg-purple-500 rounded-lg"></div>
-                        <div class="h-16 w-16 bg-pink-500 rounded-lg"></div>
-                        <div class="h-16 w-16 bg-gray-500 rounded-lg"></div>
-                        <div class="h-16 w-16 bg-teal-500 rounded-lg"></div>
+                    <div id="colorSwatches" class="grid grid-cols-3 gap-4">
+                        <!-- Color swatches will be added here -->
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-center mb-2">Picked Color:</h3>
+                        <div id="pickedColor" class="h-16 w-16 mx-auto rounded-lg text-white flex items-center justify-center"></div>
                     </div>
                 </div>
             </div>
@@ -38,6 +36,65 @@
     <footer class="text-center text-white mt-8">
         Developed with love by Joanna Wrobel <span class="text-red-500">&hearts;</span>
     </footer>
-    <script src="./iro.min.js"></script>
+    <script>
+ function createColorSwatch(color) {
+  const swatch = document.createElement('div');
+  swatch.className = 'h-16 w-16 rounded-lg';
+  swatch.style.backgroundColor = color;
+  return swatch;
+}
+
+function updateSwatches(baseColor) {
+  const colorSwatches = document.getElementById('colorSwatches');
+  colorSwatches.innerHTML = '';
+  const palette = generatePalette(baseColor);
+
+  palette.forEach(color => {
+    colorSwatches.appendChild(createColorSwatch(color));
+  });
+}
+
+function generatePalette(baseColor) {
+  const base = tinycolor(baseColor);
+  const palette = [
+    base.clone().desaturate(5).lighten(56),
+    base.clone().desaturate(5).lighten(48),
+    base.clone().desaturate(8).lighten(35),
+    base.clone().desaturate(10).lighten(25),
+    base.clone().desaturate(10).lighten(15),
+    base,
+    base.clone().saturate(10).darken(10),
+    base.clone().darken(15),
+    base.clone().darken(20),
+  ];
+
+  return palette.map(color => color.toHexString());
+}
+
+const colorPicker = new iro.ColorPicker('#colorPicker', {
+  width: 200,
+  height: 200,
+  color: 'rgb(108, 99, 255)'
+});
+
+const hexInput = document.getElementById('hexInput');
+hexInput.value = colorPicker.color.hexString(); // Set the default value in the input field
+
+colorPicker.on('color:change', color => {
+  hexInput.value = color.hexString();
+  updateSwatches(color.hexString());
+});
+
+hexInput.addEventListener('change', () => {
+  const hex = hexInput.value;
+  if (iro.Color.validateHexColor(hex)) {
+    colorPicker.color.hexString = hex;
+    updateSwatches(hex);
+  }
+});
+
+updateSwatches('#6C63FF'); // Call with the default indigo color
+
+    </script>
 </body>
 </html>
