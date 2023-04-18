@@ -1,84 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Color Palette Generator</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    .polaroid {
-      background-color: white;
-      border-radius: 0.5rem;
-      padding: 0.5rem;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    .color-fill {
-      width: 100%;
-      height: 100px;
-      border-radius: 0.25rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .color-box {
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.25rem;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
-  <div class="container mx-auto p-8">
-    <h1 class="text-2xl font-bold mb-4">Color Palette Generator</h1>
-    <p class="mb-4">
-      Use the color wheel to pick a base color, or enter a hex value directly. The generated color palette will be displayed below.
-    </p>
-    <div>
-      <input type="color" id="base-color" class="rounded-md">
+<div class="container mx-auto p-8">
+    <h1 class="text-2xl font-bold mb-4">UI Design Color Palette Generator</h1>
+    <div id="color-picker" class="mx-auto mb-4" style="width: 300px; height: 300px;"></div>
+    <div class="grid grid-cols-9 gap-4 mt-4" id="color-grid">
     </div>
-    <div class="mt-4">
-      <input id="hex-input" type="text" class="border-2 border-gray-300 rounded-md p-2 w-full" placeholder="Enter hex value">
-    </div>
-    <div class="grid grid-cols-3 gap-4 mt-4" id="color-grid">
-    </div>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-js/1.0.1/color.min.js"></script>
-  <script>
-    function createColorDiv(color) {
-      const div = document.createElement('div');
-      div.className = 'polaroid';
-      div.innerHTML = `
-        <div class="color-fill" style="background-color: ${color.toCSS()}"></div>
-        <p class="text-gray-800 font-semibold">${color.toCSS()}</p>
-        <p class="text-gray-600 text-xs">${color.toName()}</p>
-      `;
-      div.addEventListener('click', () => {
-        navigator.clipboard.writeText(color.toCSS());
-      });
-      return div;
+</div> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-js/1.0.1/color.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/iro@5.5.2/lib/iro.min.js"></script>
+<script>
+    function createColorDiv(color, index) {
+        const div = document.createElement('div');
+        div.className = 'color-box';
+        div.style.backgroundColor = color.toCSS();
+        div.style.color = index > 600 ? 'white' : 'black';
+        div.textContent = `${index}`;
+        return div;
     }
 
     function generatePalette(baseColor) {
-      const container = document.getElementById('color-grid');
-      container.innerHTML = '';
+        const container = document.getElementById('color-grid');
+        container.innerHTML = '';
 
-      const color = new Color(baseColor);
-      const palette = color.scheme('analogic', 9);
+        const color = new Color(baseColor);
+        const shades = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-      for (const c of palette.colors()) {
-        container.appendChild(createColorDiv(c));
-      }
+        for (const shade of shades) {
+            const c = color.darken(1 - shade / 1000);
+            container.appendChild(createColorDiv(c, shade));
+        }
     }
 
-    function updateBaseColor() {
-      const colorInput = document.getElementById('base-color');
-      const hexInput = document.getElementById('hex-input');
-      hexInput.value = colorInput.value;
-      generatePalette(colorInput.value);
-    }
-
-    document.getElementById('base-color').addEventListener('input', updateBaseColor);
-
-    document.getElementById('hex-input').addEventListener('input', (e) => {
-      const colorInput = document.getElementById('base-color');
-      colorInput.value = e.target.value;
-      generatePalette(e.target.value);
+    const colorPicker = new iro.ColorPicker("#color-picker", {
+        width: 300,
+        color: "#f06",
     });
 
-    updateBaseColor();
-  </script>
+    colorPicker.on("color:change", function (color) {
+        generatePalette(color.hexString);
+    });
+
+    generatePalette(colorPicker.color.hexString);
+</script>
 </body>
 </html>
