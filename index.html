@@ -57,33 +57,63 @@
     colorPicker.openHandler();
   });
 
-  function createColorSwatch(color) {
-    const swatch = document.createElement('div');
-    swatch.className = 'h-16 w-16 rounded-lg relative border-2 border-gray-300';
-    swatch.style.backgroundColor = color;
-    return swatch;
-  }
+  function createColorSwatch(color, highlight = false) {
+  const swatch = document.createElement('div');
+  swatch.className = 'h-16 w-16 rounded-lg relative';
+  swatch.style.backgroundColor = color;
+  swatch.style.border = highlight ? '2px solid #6C63FF' : '2px solid transparent';
 
-  function updateSwatches(baseColor) {
+  return swatch;
+}
+
+function updateSwatches(baseColor, userInputColor) {
   const colorSwatches = document.getElementById('colorSwatches');
   colorSwatches.innerHTML = '';
 
-  const palette = chroma.scale([chroma(baseColor).brighten(1), chroma(baseColor).darken(1)]).mode('lch').colors(9);
+  const baseHsl = chroma(baseColor).hsl();
+  const userColorHsl = chroma(userInputColor).hsl();
 
-  palette.forEach(color => {
-    const swatch = createColorSwatch(color);
+  // Generate the palette by adjusting luminosity and saturation
+  const palette = [
+    chroma(baseHsl[0], baseHsl[1], 0.95, 'hsl').hex(),
+    chroma(baseHsl[0], baseHsl[1], 0.85, 'hsl').hex(),
+    chroma(baseHsl[0], baseHsl[1], 0.75, 'hsl').hex(),
+    chroma(baseHsl[0], baseHsl[1], 0.65, 'hsl').hex(),
+    chroma(baseHsl[0], baseHsl[1], 0.55, 'hsl').hex(),
+    chroma(baseHsl[0], baseHsl[1], 0.45, 'hsl').hex(),
+    chroma(baseHsl[0], baseHsl[1], 0.35, 'hsl').hex(),
+    chroma(baseHsl[0], baseHsl[1], 0.25, 'hsl').hex(),
+    chroma(baseHsl[0], baseHsl[1], 0.15, 'hsl').hex(),
+  ];
+
+  // Find the nearest color in the palette to the user-input color
+  const nearestIndex = palette.reduce((prevIndex, currentColor, currentIndex) => {
+    return chroma.distance(currentColor, userInputColor, 'hsl') < chroma.distance(palette[prevIndex], userInputColor, 'hsl') ? currentIndex : prevIndex;
+  }, 0);
+
+  // Replace the nearest color in the palette with the user-input color
+  palette[nearestIndex] = userInputColor;
+
+  palette.forEach((color, index) => {
+    const swatch = createColorSwatch(color, index === nearestIndex);
     colorSwatches.appendChild(swatch);
   });
 }
+
+
 submitButton.addEventListener('click', () => {
-const hex = hexInput.value;
-if (chroma.valid(hex)) {
-  updateSwatches(chroma(hex));
-}
+  const hex = hexInput.value;
+  if (chroma.valid(hex)) {
+    updateSwatches(chroma(hex), hex);
+
+  }
 });
 
+
 updateColorPreview();
-updateSwatches(chroma(hexInput.value));
+updateSwatches(chroma(hexInput.value), hexInput.value);
+
+
 
 </script>
 </body>
